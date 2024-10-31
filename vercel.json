@@ -20,9 +20,5 @@
       "src": "/(.*)",
       "dest": "frontend/$1"
     }
-  ],
-  "env": {
-    "OPENAI_API_KEY": "@openai-api-key",
-    "BASE_URL": "@base-url"
-  }
+  ]
 } 
