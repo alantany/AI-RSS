@@ -73,4 +73,7 @@ const Setting = require('./models/Setting');
   } catch (error) {
     console.error('启动失败:', error);
   }
-})(); 
+})();
+
+// 为 Vercel 添加导出
+module.exports = app; 
