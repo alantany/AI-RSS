@@ -35,7 +35,7 @@ const verifyPassword = async (req, res, next) => {
 // 初始化或更改密码
 router.post('/password', async (req, res) => {
   try {
-    console.log('收到密码置请求:', req.body);
+    console.log('收到密码���请求:', req.body);
     const { password } = req.body;
     
     if (!password) {
@@ -230,7 +230,7 @@ router.post('/keywords', async (req, res) => {
     }
 
     addKeyword(category, keyword);
-    res.json({ message: '关键词添加成功' });
+    res.json({ message: '关键词添加���功' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
