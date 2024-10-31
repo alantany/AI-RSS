@@ -2,9 +2,11 @@
   "name": "ai-rss",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["frontend", "backend"],
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
     "start": "cd backend && npm install && node src/app.js"
+  },
+  "dependencies": {
+    "react-scripts": "^5.0.1"
   }
 }
