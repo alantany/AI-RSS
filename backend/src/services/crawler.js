@@ -465,7 +465,7 @@ ${index}. 标题：${a.title}
       console.log('文章数量较少，跳过 AI 筛选');
       return {
         selectedArticles: preFiltered,
-        reasons: preFiltered.map(() => '关键词匹配')
+        reasons: preFiltered.map(() => '���键词匹配')
       };
     }
 
