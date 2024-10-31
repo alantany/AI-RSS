@@ -1,45 +1,45 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const Article = sequelize.define('Article', {
+const articleSchema = new mongoose.Schema({
   title: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: String,
+    required: true
   },
   originalTitle: {
-    type: DataTypes.STRING
+    type: String
   },
   content: {
-    type: DataTypes.TEXT,
-    allowNull: false
+    type: String,
+    required: true
   },
   originalContent: {
-    type: DataTypes.TEXT
+    type: String
   },
   source: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: String,
+    required: true
   },
   url: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: String,
+    required: true,
     unique: true
   },
   imageUrl: {
-    type: DataTypes.STRING
+    type: String
   },
   publishDate: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW
+    type: Date,
+    default: Date.now
   },
   likes: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0
+    type: Number,
+    default: 0
   },
   tags: {
-    type: DataTypes.STRING,
-    allowNull: true
+    type: String
   }
+}, {
+  timestamps: true  // 自动添加 createdAt 和 updatedAt
 });
 
-module.exports = Article; 
+module.exports = mongoose.model('Article', articleSchema); 

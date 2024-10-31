@@ -299,10 +299,10 @@ ${index}. 标题：${a.title}
           }
 
           // 获取已存在的文章 URL
-          const existingUrls = new Set((await Article.findAll({
-            where: { source: source.name },
-            attributes: ['url']
-          })).map(article => article.url));
+          const existingUrls = new Set(
+            (await Article.find({ source: source.name }, { url: 1 }))
+              .map(article => article.url)
+          );
 
           // 过滤出新文章
           const newArticles = feed.items
@@ -394,9 +394,10 @@ ${index}. 标题：${a.title}
       }
 
       // 更新最后抓取时间
-      await Setting.update(
+      await Setting.findOneAndUpdate(
+        {},
         { lastCrawlTime: new Date() },
-        { where: {} }
+        { upsert: true }
       );
 
       console.log('抓取完成');

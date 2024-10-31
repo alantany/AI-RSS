@@ -1,22 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article');
-const { Op } = require('sequelize');
 
 // 获取文章列表
 router.get('/', async (req, res) => {
   try {
     const { page = 1, pageSize = 10 } = req.query;
-    const offset = (page - 1) * pageSize;
+    const skip = (page - 1) * pageSize;
 
-    const { rows: articles, count: total } = await Article.findAndCountAll({
-      order: [
-        ['createdAt', 'DESC'],
-        ['publishDate', 'DESC']
-      ],
-      limit: parseInt(pageSize),
-      offset: parseInt(offset)
-    });
+    const [articles, total] = await Promise.all([
+      Article.find()
+        .sort({ createdAt: -1, publishDate: -1 })
+        .skip(skip)
+        .limit(parseInt(pageSize)),
+      Article.countDocuments()
+    ]);
 
     res.json({
       articles,
@@ -29,21 +27,27 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 手动触发抓取
-router.post('/fetch', async (req, res) => {
+// 点赞文章
+router.post('/:id/like', async (req, res) => {
   try {
-    const crawlerService = new CrawlerService();
-    await crawlerService.manualFetch();
-    res.json({ message: '抓取任务已执行' });
+    const article = await Article.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ message: '文章不存在' });
+    }
+    
+    article.likes = (article.likes || 0) + 1;
+    await article.save();
+    
+    res.json({ message: '点赞成功', likes: article.likes });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// 添加一个新的路由来检查文章数量
+// 获取文章总数
 router.get('/count', async (req, res) => {
   try {
-    const count = await Article.count();
+    const count = await Article.countDocuments();
     res.json({ count });
   } catch (error) {
     res.status(500).json({ message: error.message });

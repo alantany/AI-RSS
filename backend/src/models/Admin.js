@@ -1,21 +1,20 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 const crypto = require('crypto');
 
-const Admin = sequelize.define('Admin', {
+const adminSchema = new mongoose.Schema({
   password: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: String,
+    required: true
   },
   isFirstLogin: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: true
+    type: Boolean,
+    default: true
   }
 });
 
-// 添加密码哈希方法
-Admin.hashPassword = (password) => {
+// 静态方法：密码哈希
+adminSchema.statics.hashPassword = function(password) {
   return crypto.createHash('sha256').update(password).digest('hex');
 };
 
-module.exports = Admin; 
+module.exports = mongoose.model('Admin', adminSchema); 

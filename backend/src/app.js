@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const sequelize = require('./config/database');
+const connectDB = require('./config/database');
 const CrawlerService = require('./services/crawler');
 require('dotenv').config();
 
@@ -18,9 +18,9 @@ const Setting = require('./models/Setting');
 // 初始化数据库和启动服务器
 (async () => {
   try {
-    // 使用 force: false，保留现有数据
-    await sequelize.sync({ force: false });
-    console.log('数据库模型同步完成');
+    // 连接到 MongoDB
+    await connectDB();
+    console.log('数据库连接成功');
 
     // 检查是否存在管理员账户
     const adminExists = await Admin.findOne();

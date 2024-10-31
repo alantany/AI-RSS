@@ -1,26 +1,28 @@
-const { Sequelize } = require('sequelize');
-const path = require('path');
+const mongoose = require('mongoose');
 
-let sequelize;
+const connectDB = async (retries = 5) => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // 超时时间
+      retryWrites: true
+    });
 
-if (process.env.NODE_ENV === 'production') {
-  // 生产环境使用 PostgreSQL
-  sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    ssl: true,
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
+    console.log('MongoDB 连接成功');
+    return conn;
+  } catch (error) {
+    console.error('MongoDB 连接失败:', error);
+    
+    if (retries > 0) {
+      console.log(`还剩 ${retries} 次重试机会，5秒后重试...`);
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      return connectDB(retries - 1);
+    } else {
+      console.error('MongoDB 连接重试次数用完，退出程序');
+      process.exit(1);
     }
-  });
-} else {
-  // 开发环境使用 SQLite
-  sequelize = new Sequelize({
-    dialect: 'sqlite',
-    storage: path.join(__dirname, '../../database.sqlite')
-  });
-}
+  }
+};
 
-module.exports = sequelize; 
+module.exports = connectDB; 

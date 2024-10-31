@@ -114,32 +114,25 @@ router.post('/settings', verifyPassword, async (req, res) => {
       autoCrawl
     } = req.body;
     
-    const setting = await Setting.findOne();
-
-    if (setting) {
-      await setting.update({ 
+    await Setting.findOneAndUpdate(
+      {},
+      { 
         crawlInterval, 
         preArticlesPerSource, 
         finalArticlesCount,
         autoCrawl
-      });
+      },
+      { upsert: true }
+    );
 
-      // 如果自动抓取设置发生变化，更新爬虫任务
-      const crawlerService = new CrawlerService();
-      if (autoCrawl) {
-        console.log('启动定时抓取任务');
-        crawlerService.startCronJob();
-      } else {
-        console.log('停止定时抓取任务');
-        crawlerService.stopCronJob();
-      }
+    // 如果自动抓取设置发生变化，更新爬虫任务
+    const crawlerService = new CrawlerService();
+    if (autoCrawl) {
+      console.log('启动定时抓取任务');
+      crawlerService.startCronJob();
     } else {
-      await Setting.create({ 
-        crawlInterval, 
-        preArticlesPerSource, 
-        finalArticlesCount,
-        autoCrawl
-      });
+      console.log('停止定时抓取任务');
+      crawlerService.stopCronJob();
     }
 
     res.json({ message: '设置更新成功' });

@@ -1,31 +1,29 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const Setting = sequelize.define('Setting', {
+const settingSchema = new mongoose.Schema({
   crawlInterval: {
-    type: DataTypes.INTEGER,
-    defaultValue: 240, // 默认4小时（240分钟）
-    allowNull: false
+    type: Number,
+    default: 240,
+    required: true
   },
   preArticlesPerSource: {
-    type: DataTypes.INTEGER,
-    defaultValue: 20,  // 每个源预抓取的文章数量
-    allowNull: false
+    type: Number,
+    default: 20,
+    required: true
   },
   finalArticlesCount: {
-    type: DataTypes.INTEGER,
-    defaultValue: 5,   // 最终保存的文章数量
-    allowNull: false
+    type: Number,
+    default: 5,
+    required: true
   },
   autoCrawl: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,  // 默认关闭自动抓取
-    allowNull: false
+    type: Boolean,
+    default: false,
+    required: true
   },
   lastCrawlTime: {
-    type: DataTypes.DATE,
-    allowNull: true
+    type: Date
   }
 });
 
-module.exports = Setting; 
+module.exports = mongoose.model('Setting', settingSchema); 
