@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "framework": "create-react-app",
   "builds": [
     {
       "src": "backend/src/app.js",
@@ -9,6 +10,7 @@
       "src": "frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
+        "framework": "create-react-app",
         "distDir": "build"
       }
     }
