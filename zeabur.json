@@ -1,0 +1,18 @@
+{
+  "services": [
+    {
+      "name": "backend",
+      "type": "nodejs",
+      "path": "backend",
+      "env": {
+        "PORT": "4000"
+      }
+    },
+    {
+      "name": "frontend",
+      "type": "static",
+      "path": "frontend/build",
+      "buildCommand": "cd frontend && npm install && npm run build"
+    }
+  ]
+} 
