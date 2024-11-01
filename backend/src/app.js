@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./config/database');
-const CrawlerService = require('./services/crawler');
 require('dotenv').config();
 
 const app = express();
@@ -24,13 +24,18 @@ const adminRouter = require('./routes/admin');
 app.use('/api/articles', articlesRouter);
 app.use('/api/admin', adminRouter);
 
-// 对于本地开发
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`服务器运行在端口 ${PORT}`);
+// 在生产环境中提供静态文件
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../../frontend/build')));
+  
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/build/index.html'));
   });
 }
 
-// 为 Vercel 导出
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`服务器运行在端口 ${PORT}`);
+});
+
 module.exports = app; 
