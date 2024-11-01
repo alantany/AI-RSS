@@ -5,24 +5,41 @@ const Article = require('../models/Article');
 // 获取文章列表
 router.get('/', async (req, res) => {
   try {
-    const { page = 1, pageSize = 10 } = req.query;
+    const { page = 1, pageSize = 10, category } = req.query;
     const skip = (page - 1) * pageSize;
 
+    // 构建查询条件
+    const query = {};
+    if (category) {
+      query.category = category;
+    }
+
     const [articles, total] = await Promise.all([
-      Article.find()
-        .sort({ createdAt: -1, publishDate: -1 })
+      Article.find(query)
+        .select('title content summary source url imageUrl publishDate likes views tags category')
+        .sort({ publishDate: -1 })
         .skip(skip)
         .limit(parseInt(pageSize)),
-      Article.countDocuments()
+      Article.countDocuments(query)
     ]);
 
+    // 处理文章内容，生成摘要
+    const processedArticles = articles.map(article => {
+      const doc = article.toObject();
+      if (!doc.summary) {
+        doc.summary = doc.content.substring(0, 100) + '...';
+      }
+      return doc;
+    });
+
     res.json({
-      articles,
+      articles: processedArticles,
       total,
       currentPage: parseInt(page),
       totalPages: Math.ceil(total / pageSize)
     });
   } catch (error) {
+    console.error('获取文章列表错误:', error);
     res.status(500).json({ message: error.message });
   }
 });
@@ -38,18 +55,28 @@ router.post('/:id/like', async (req, res) => {
     article.likes = (article.likes || 0) + 1;
     await article.save();
     
-    res.json({ message: '点赞成功', likes: article.likes });
+    res.json({ likes: article.likes });
   } catch (error) {
+    console.error('点赞文章错误:', error);
     res.status(500).json({ message: error.message });
   }
 });
 
-// 获取文章总数
-router.get('/count', async (req, res) => {
+// 获取文章详情
+router.get('/:id', async (req, res) => {
   try {
-    const count = await Article.countDocuments();
-    res.json({ count });
+    const article = await Article.findById(req.params.id);
+    if (!article) {
+      return res.status(404).json({ message: '文章不存在' });
+    }
+
+    // 增加浏览量
+    article.views = (article.views || 0) + 1;
+    await article.save();
+
+    res.json(article);
   } catch (error) {
+    console.error('获取文章详情错误:', error);
     res.status(500).json({ message: error.message });
   }
 });

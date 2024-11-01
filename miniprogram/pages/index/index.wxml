@@ -1,0 +1,58 @@
+<view class="container">
+  <view class="header">
+    <text class="title">AI 新闻聚合</text>
+    <button 
+      class="settings-btn" 
+      size="mini" 
+      type="primary"
+      bindtap="navigateToAdmin"
+    >
+      管理设置
+    </button>
+  </view>
+
+  <view class="article-list">
+    <block wx:for="{{articles}}" wx:key="_id">
+      <view class="article-card">
+        <view class="article-header">
+          <text class="article-title">{{item.title}}</text>
+          <text class="article-source">{{item.source}}</text>
+        </view>
+        <view class="article-summary">{{item.summary || item.content}}</view>
+        <view class="article-footer">
+          <text class="article-date">{{item.publishDate}}</text>
+          <view class="article-actions">
+            <button 
+              class="action-btn like-btn" 
+              size="mini" 
+              data-id="{{item._id}}" 
+              bindtap="handleLike"
+            >
+              {{item.likes || 0}}
+            </button>
+            <button 
+              class="action-btn original-btn" 
+              size="mini" 
+              data-url="{{item.url}}" 
+              bindtap="navigateToOriginal"
+            >
+              查看原文
+            </button>
+            <button 
+              class="action-btn share-btn" 
+              size="mini" 
+              open-type="share" 
+              data-article="{{item}}"
+            >
+              分享
+            </button>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+  
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+</view> 

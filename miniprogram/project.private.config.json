@@ -1,0 +1,7 @@
+{
+  "projectname": "ai-news-miniprogram",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  }
+}

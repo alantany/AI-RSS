@@ -5,14 +5,11 @@ const articleSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  originalTitle: {
-    type: String
-  },
   content: {
     type: String,
     required: true
   },
-  originalContent: {
+  summary: {
     type: String
   },
   source: {
@@ -35,11 +32,18 @@ const articleSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  tags: {
+  views: {
+    type: Number,
+    default: 0
+  },
+  tags: [{
+    type: String
+  }],
+  category: {
     type: String
   }
 }, {
-  timestamps: true  // 自动添加 createdAt 和 updatedAt
+  timestamps: true
 });
 
 module.exports = mongoose.model('Article', articleSchema); 

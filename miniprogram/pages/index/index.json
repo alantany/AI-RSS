@@ -1,0 +1,6 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "AI 新闻聚合",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f5f5f5"
+} 

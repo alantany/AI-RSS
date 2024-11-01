@@ -6,8 +6,13 @@ require('dotenv').config();
 
 const app = express();
 
-// 中间件
-app.use(cors());
+// 配置 CORS，允许小程序访问
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // 导入所有模型

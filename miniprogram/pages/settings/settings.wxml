@@ -1,0 +1,100 @@
+<view class="container">
+  <!-- 添加密码验证界面 -->
+  <view class="password-verify" wx:if="{{!isVerified}}">
+    <view class="verify-box">
+      <text class="title">管理员验证</text>
+      <input 
+        type="password" 
+        class="password-input"
+        placeholder="请输入管理员密码"
+        password="{{true}}"
+        value="{{password}}"
+        bindinput="handlePasswordInput"
+        confirm-type="done"
+      />
+      <button 
+        type="primary" 
+        class="verify-btn"
+        bindtap="handleVerify"
+      >
+        验证
+      </button>
+    </view>
+  </view>
+
+  <!-- 管理面板内容 -->
+  <view class="admin-panel" wx:else>
+    <view class="tabs">
+      <view class="tab {{activeTab === 'basic' ? 'active' : ''}}" bindtap="switchTab" data-tab="basic">基本设置</view>
+      <view class="tab {{activeTab === 'keywords' ? 'active' : ''}}" bindtap="switchTab" data-tab="keywords">关键词管理</view>
+    </view>
+
+    <view class="tab-content" wx:if="{{activeTab === 'basic'}}">
+      <form bindsubmit="handleSubmit">
+        <view class="form-item">
+          <text class="label">抓取间隔（分钟）</text>
+          <input type="number" name="crawlInterval" value="{{settings.crawlInterval}}" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">每个源预抓取文章数</text>
+          <input type="number" name="preArticlesPerSource" value="{{settings.preArticlesPerSource}}" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">最终保存文章数</text>
+          <input type="number" name="finalArticlesCount" value="{{settings.finalArticlesCount}}" />
+        </view>
+
+        <view class="form-item">
+          <text class="label">自动抓取</text>
+          <switch name="autoCrawl" checked="{{settings.autoCrawl}}" />
+        </view>
+
+        <view class="form-actions">
+          <button type="primary" formType="submit">保存设置</button>
+          <button bindtap="handleManualCrawl">手动抓取</button>
+        </view>
+      </form>
+    </view>
+
+    <view class="tab-content" wx:if="{{activeTab === 'keywords'}}">
+      <view class="keywords-manager">
+        <view class="category-list">
+          <view 
+            wx:for="{{categories}}" 
+            wx:key="index"
+            class="category-item {{currentCategory === item ? 'active' : ''}}"
+            bindtap="selectCategory"
+            data-category="{{item}}"
+          >
+            {{item}}
+          </view>
+        </view>
+
+        <view class="keyword-list">
+          <view class="keyword-input">
+            <input 
+              type="text" 
+              placeholder="输入新关键词" 
+              value="{{newKeyword}}"
+              bindinput="handleKeywordInput"
+            />
+            <button size="mini" bindtap="addKeyword">添加</button>
+          </view>
+
+          <view class="keyword-items">
+            <view 
+              wx:for="{{currentKeywords}}" 
+              wx:key="index" 
+              class="keyword-item"
+            >
+              {{item}}
+              <text class="delete" bindtap="removeKeyword" data-keyword="{{item}}">×</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 
