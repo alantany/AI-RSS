@@ -33,8 +33,9 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+// 使用 Railway 提供的 PORT 环境变量
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`服务器运行在端口 ${PORT}`);
 });
 
