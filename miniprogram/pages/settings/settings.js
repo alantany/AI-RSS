@@ -44,6 +44,10 @@ Page({
       const settings = await getSettings();
       console.log('获取到设置:', settings);
       
+      if (settings.keywords && typeof settings.keywords === 'object') {
+        settings.keywords = new Map(Object.entries(settings.keywords));
+      }
+      
       this.setData({ 
         settings,
         currentKeywords: settings.keywords?.get(this.data.currentCategory) || []

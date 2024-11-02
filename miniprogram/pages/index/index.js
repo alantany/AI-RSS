@@ -1,49 +1,61 @@
-const { getArticles, likeArticle } = require('../../utils/api.js');
+const { getArticles, likeArticle, getArticleCount } = require('../../utils/api.js');
 
 Page({
   data: {
     articles: [],
     currentPage: 1,
     totalPages: 1,
-    loading: false
+    totalArticles: 0,
+    loading: false,
+    categories: {
+      'RAG': 'RAG技术',
+      'LLM_DEV': '模型开发',
+      'LLM_NEWS': '模型新闻',
+      'GENERAL_AI': '通用AI'
+    }
   },
 
   onLoad() {
     this.loadArticles();
+    this.loadArticleCount();
   },
 
-  async onPullDownRefresh() {
+  async loadArticleCount() {
     try {
-      this.setData({ currentPage: 1 });
-      await this.loadArticles();
-      wx.stopPullDownRefresh();
+      const { count } = await getArticleCount();
+      this.setData({ totalArticles: count });
     } catch (error) {
-      wx.showToast({
-        title: error.message || '刷新失败',
-        icon: 'none'
-      });
-      wx.stopPullDownRefresh();
+      console.error('获取文章总数失败:', error);
     }
   },
 
-  async loadArticles() {
+  async loadArticles(refresh = false) {
+    if (this.data.loading) return;
+    
     try {
       this.setData({ loading: true });
-      const { articles, totalPages, currentPage } = await getArticles(this.data.currentPage);
+      const { articles, totalPages, currentPage } = await getArticles(
+        refresh ? 1 : this.data.currentPage
+      );
       
-      if (this.data.currentPage === 1) {
+      // 处理文章分类显示
+      const processedArticles = articles.map(article => ({
+        ...article,
+        category: this.data.categories[article.category] || article.category,
+        publishDate: this.formatDate(article.publishDate)
+      }));
+
+      if (refresh) {
         this.setData({
-          articles,
-          totalPages,
-          currentPage,
-          loading: false
+          articles: processedArticles,
+          currentPage: 1,
+          totalPages
         });
       } else {
         this.setData({
-          articles: [...this.data.articles, ...articles],
-          totalPages,
+          articles: [...this.data.articles, ...processedArticles],
           currentPage,
-          loading: false
+          totalPages
         });
       }
     } catch (error) {
@@ -51,8 +63,14 @@ Page({
         title: error.message || '加载失败',
         icon: 'none'
       });
+    } finally {
       this.setData({ loading: false });
     }
+  },
+
+  formatDate(dateString) {
+    const date = new Date(dateString);
+    return `${date.getMonth() + 1}月${date.getDate()}日`;
   },
 
   async handleLike(e) {
@@ -77,62 +95,19 @@ Page({
     }
   },
 
+  onPullDownRefresh() {
+    this.loadArticles(true).then(() => {
+      wx.stopPullDownRefresh();
+    });
+  },
+
   onReachBottom() {
-    if (this.data.currentPage < this.data.totalPages && !this.data.loading) {
+    if (this.data.currentPage < this.data.totalPages) {
       this.setData({
         currentPage: this.data.currentPage + 1
       }, () => {
         this.loadArticles();
       });
     }
-  },
-
-  onShareAppMessage(res) {
-    return {
-      title: 'AI 新闻聚合',
-      path: '/pages/index/index',
-      imageUrl: '/images/share.png'
-    }
-  },
-
-  onShareTimeline() {
-    return {
-      title: 'AI 新闻聚合',
-      query: '',
-      imageUrl: '/images/share.png'
-    }
-  },
-
-  navigateToDetail(e) {
-    const { id } = e.currentTarget.dataset;
-    wx.navigateTo({
-      url: `/pages/detail/detail?id=${id}`
-    });
-  },
-
-  navigateToOriginal(e) {
-    const { url } = e.currentTarget.dataset;
-    wx.navigateTo({
-      url: `/pages/webview/webview?url=${encodeURIComponent(url)}`
-    });
-  },
-
-  handleCopyLink(e) {
-    const { url } = e.currentTarget.dataset;
-    wx.setClipboardData({
-      data: url,
-      success: () => {
-        wx.showToast({
-          title: '链接已复制',
-          icon: 'success'
-        });
-      }
-    });
-  },
-
-  navigateToAdmin() {
-    wx.navigateTo({
-      url: '/pages/settings/settings'
-    });
   }
 }); 

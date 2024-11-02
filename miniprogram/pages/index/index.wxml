@@ -1,58 +1,33 @@
 <view class="container">
   <view class="header">
-    <text class="title">AI 新闻聚合</text>
-    <button 
-      class="settings-btn" 
-      size="mini" 
-      type="primary"
-      bindtap="navigateToAdmin"
-    >
-      管理设置
-    </button>
+    <view class="title-section">
+      <text class="title">AI 新闻聚合</text>
+      <text class="article-count">共 {{totalArticles}} 篇</text>
+    </view>
   </view>
 
   <view class="article-list">
-    <block wx:for="{{articles}}" wx:key="_id">
-      <view class="article-card">
-        <view class="article-header">
-          <text class="article-title">{{item.title}}</text>
-          <text class="article-source">{{item.source}}</text>
-        </view>
-        <view class="article-summary">{{item.summary || item.content}}</view>
-        <view class="article-footer">
-          <text class="article-date">{{item.publishDate}}</text>
-          <view class="article-actions">
-            <button 
-              class="action-btn like-btn" 
-              size="mini" 
-              data-id="{{item._id}}" 
-              bindtap="handleLike"
-            >
-              {{item.likes || 0}}
-            </button>
-            <button 
-              class="action-btn original-btn" 
-              size="mini" 
-              data-url="{{item.url}}" 
-              bindtap="navigateToOriginal"
-            >
-              查看原文
-            </button>
-            <button 
-              class="action-btn share-btn" 
-              size="mini" 
-              open-type="share" 
-              data-article="{{item}}"
-            >
-              分享
-            </button>
+    <view class="article-card" wx:for="{{articles}}" wx:key="_id">
+      <view class="article-category">{{item.category}}</view>
+      <view class="article-header">
+        <text class="article-title">{{item.title}}</text>
+        <text class="article-source">{{item.source}}</text>
+      </view>
+      <view class="article-summary">{{item.summary}}</view>
+      <view class="article-footer">
+        <text class="article-date">{{item.publishDate}}</text>
+        <view class="article-actions">
+          <view class="action-item">
+            <text>{{item.views}} 阅读</text>
+          </view>
+          <view class="action-item" bindtap="handleLike" data-id="{{item._id}}">
+            <text>{{item.likes}} 点赞</text>
           </view>
         </view>
       </view>
-    </block>
+    </view>
   </view>
-  
-  <view class="loading" wx:if="{{loading}}">
-    <text class="loading-text">加载中...</text>
-  </view>
+
+  <view class="loading" wx:if="{{loading}}">加载中...</view>
+  <view class="no-more" wx:if="{{!loading && currentPage >= totalPages}}">没有更多文章了</view>
 </view> 
