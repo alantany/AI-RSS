@@ -109,5 +109,11 @@ Page({
         this.loadArticles();
       });
     }
+  },
+
+  navigateToAdmin() {
+    wx.navigateTo({
+      url: '/pages/settings/settings'
+    });
   }
 }); 
