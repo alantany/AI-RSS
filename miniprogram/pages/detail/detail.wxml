@@ -1,33 +1,20 @@
 <view class="container">
   <view class="article-detail" wx:if="{{!loading}}">
     <view class="article-header">
-      <text class="article-title">{{article.title}}</text>
+      <text class="article-title" user-select="true">{{article.translatedTitle || article.title}}</text>
       <view class="article-meta">
-        <text class="article-source">{{article.source}}</text>
-        <text class="article-date">{{article.publishDate}}</text>
+        <text class="article-source" user-select="true">{{article.source}}</text>
+        <text class="article-date" user-select="true">{{article.publishDate}}</text>
       </view>
     </view>
     
-    <view class="article-content">
-      <text>{{article.content}}</text>
-    </view>
-    
-    <view class="article-actions">
-      <button 
-        class="action-btn {{isFavorite ? 'favorite' : ''}}" 
-        bindtap="handleFavorite"
-      >
-        <text class="iconfont {{isFavorite ? 'icon-star-filled' : 'icon-star'}}"></text>
-        {{isFavorite ? '已收藏' : '收藏'}}
-      </button>
-      <button 
-        class="action-btn"
-        open-type="share"
-      >
-        <text class="iconfont icon-share"></text>
-        分享
-      </button>
-    </view>
+    <scroll-view class="article-content" scroll-y>
+      <rich-text 
+        nodes="{{formattedContent}}" 
+        user-select="true"
+        space="nbsp"
+      ></rich-text>
+    </scroll-view>
   </view>
   
   <view class="loading" wx:if="{{loading}}">

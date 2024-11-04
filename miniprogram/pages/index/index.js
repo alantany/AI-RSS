@@ -103,22 +103,23 @@ Page({
   async handleLike(e) {
     const { id } = e.currentTarget.dataset;
     try {
-      await likeArticle(id);
-      const { articles } = this.data;
-      const article = articles.find(a => a._id === id);
-      if (article) {
-        article.likes = (article.likes || 0) + 1;
-        this.setData({ articles });
+      const response = await wx.request({
+        url: `${BASE_URL}/articles/${id}/like`,
+        method: 'POST'
+      });
+
+      if (response.statusCode === 200) {
+        // 更新本地数据
+        const { articles } = this.data;
+        const index = articles.findIndex(a => a._id === id);
+        if (index !== -1) {
+          articles[index].likes = (articles[index].likes || 0) + 1;
+          articles[index].hasLiked = true;
+          this.setData({ articles });
+        }
       }
-      wx.showToast({
-        title: '点赞成功',
-        icon: 'success'
-      });
     } catch (error) {
-      wx.showToast({
-        title: error.message || '点赞失败',
-        icon: 'none'
-      });
+      console.error('点赞失败:', error);
     }
   },
 
@@ -152,28 +153,10 @@ Page({
   // 修改文章点击处理方法
   handleArticleClick(e) {
     const { id } = e.currentTarget.dataset;
-    console.log('点击文章，ID:', id);
-    
-    if (id) {
-      wx.navigateTo({
-        url: `/pages/detail/detail?id=${id}`,
-        success: () => {
-          console.log('跳转成功');
-        },
-        fail: (error) => {
-          console.error('跳转失败:', error);
-          wx.showToast({
-            title: '打开失败',
-            icon: 'none'
-          });
-        }
-      });
-    } else {
-      wx.showToast({
-        title: '文章ID无效',
-        icon: 'none'
-      });
-    }
+    this.updateReadCount(id);
+    wx.navigateTo({
+      url: `/pages/detail/detail?id=${id}`
+    });
   },
 
   // 更新文章翻译
@@ -269,6 +252,67 @@ Page({
       console.error('加载文章失败:', error);
       this.setData({ loading: false });
       wx.stopPullDownRefresh();
+    }
+  },
+
+  // 处理收藏
+  async handleStar(e) {
+    const { id } = e.currentTarget.dataset;
+    try {
+      const response = await wx.request({
+        url: `${BASE_URL}/articles/${id}/star`,
+        method: 'POST'
+      });
+
+      if (response.statusCode === 200) {
+        // 更新本地数据
+        const { articles } = this.data;
+        const index = articles.findIndex(a => a._id === id);
+        if (index !== -1) {
+          articles[index].stars = (articles[index].stars || 0) + 1;
+          articles[index].hasStarred = true;
+          this.setData({ articles });
+        }
+      }
+    } catch (error) {
+      console.error('收藏失败:', error);
+    }
+  },
+
+  // 处理分享
+  onShareAppMessage(e) {
+    if (e.from === 'button') {
+      const { id, title } = e.target.dataset;
+      return {
+        title,
+        path: `/pages/detail/detail?id=${id}`
+      };
+    }
+    return {
+      title: 'AI 新闻聚合',
+      path: '/pages/index/index'
+    };
+  },
+
+  // 更新阅读数
+  async updateReadCount(id) {
+    try {
+      const response = await wx.request({
+        url: `${BASE_URL}/articles/${id}/read`,
+        method: 'POST'
+      });
+
+      if (response.statusCode === 200) {
+        // 更新本地数据
+        const { articles } = this.data;
+        const index = articles.findIndex(a => a._id === id);
+        if (index !== -1) {
+          articles[index].reads = (articles[index].reads || 0) + 1;
+          this.setData({ articles });
+        }
+      }
+    } catch (error) {
+      console.error('更新阅读数失败:', error);
     }
   }
 }); 

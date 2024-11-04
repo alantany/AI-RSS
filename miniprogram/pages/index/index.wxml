@@ -21,6 +21,29 @@
     
     <view class="article-footer">
       <text class="article-date">{{item.publishDate}}</text>
+      <view class="article-stats">
+        <view class="stat-item" bindtap="handleLike" data-id="{{item._id}}">
+          <image class="stat-icon" src="/assets/icons/like.svg" style="{{item.hasLiked ? 'stroke: #07c160;' : ''}}" />
+          <text class="stat-text">{{item.likes || 0}}</text>
+        </view>
+        <view class="stat-item">
+          <image class="stat-icon" src="/assets/icons/read.svg" />
+          <text class="stat-text">{{item.reads || 0}}</text>
+        </view>
+        <view class="stat-item" bindtap="handleStar" data-id="{{item._id}}">
+          <image class="stat-icon" src="/assets/icons/star.svg" style="{{item.hasStarred ? 'stroke: #07c160;' : ''}}" />
+          <text class="stat-text">{{item.stars || 0}}</text>
+        </view>
+        <button 
+          class="share-button" 
+          open-type="share" 
+          data-id="{{item._id}}"
+          data-title="{{item.translatedTitle || item.title}}"
+        >
+          <image class="stat-icon" src="/assets/icons/share.svg" />
+          <text class="stat-text">{{item.shares || 0}}</text>
+        </button>
+      </view>
     </view>
   </view>
 

@@ -1,14 +1,14 @@
-const { getArticleDetail, toggleFavorite } = require('../../utils/api.js');
+const { getArticleDetail } = require('../../utils/api.js');
 
 Page({
   data: {
     article: null,
-    isFavorite: false,
     loading: true
   },
 
   onLoad(options) {
     const { id } = options;
+    console.log('加载文章，ID:', id);
     this.loadArticle(id);
   },
 
@@ -16,14 +16,22 @@ Page({
     try {
       this.setData({ loading: true });
       const article = await getArticleDetail(id);
-      const isFavorite = wx.getStorageSync('favorites') || [];
+      console.log('文章加载成功:', article._id);
+      console.log('内容长度:', article.content?.length);
+      console.log('翻译内容长度:', article.translatedContent?.length);
       
+      // 检查内容格式
+      const content = article.translatedContent || article.content;
+      const formattedContent = this.formatContent(content);
+      console.log('格式化后内容长度:', formattedContent.length);
+
       this.setData({
         article,
-        isFavorite: isFavorite.includes(id),
+        formattedContent,  // 添加到 data 中
         loading: false
       });
     } catch (error) {
+      console.error('加载文章失败:', error);
       wx.showToast({
         title: error.message || '加载失败',
         icon: 'none'
@@ -32,38 +40,35 @@ Page({
     }
   },
 
-  async handleFavorite() {
-    const { article, isFavorite } = this.data;
+  formatContent(content) {
+    if (!content) return '';
+    
     try {
-      await toggleFavorite(article._id);
-      let favorites = wx.getStorageSync('favorites') || [];
-      
-      if (isFavorite) {
-        favorites = favorites.filter(id => id !== article._id);
-      } else {
-        favorites.push(article._id);
-      }
-      
-      wx.setStorageSync('favorites', favorites);
-      this.setData({ isFavorite: !isFavorite });
-      
-      wx.showToast({
-        title: isFavorite ? '取消收藏' : '收藏成功',
-        icon: 'success'
-      });
-    } catch (error) {
-      wx.showToast({
-        title: error.message || '操作失败',
-        icon: 'none'
-      });
-    }
-  },
+      // 更新正则表达式以匹配所有可能的标题格式
+      const formattedContent = content
+        .split('\n')
+        .map(line => {
+          // 匹配所有可能的标题格式
+          const titleMatch = line.match(/^(?:#{1,3}(?:\s*#)*|#\s+#\s+#)\s*(.*?)$/);
+          if (titleMatch) {
+            const titleText = titleMatch[1].trim();
+            return `<h3 class="section-title">${titleText}</h3>`;
+          }
+          // 处理普通段落
+          const text = line.trim();
+          if (text) {
+            return `<p>${text}</p>`;
+          }
+          return '';  // 空行
+        })
+        .filter(line => line)  // 移除空行
+        .join('\n');
 
-  onShareAppMessage() {
-    const { article } = this.data;
-    return {
-      title: article.title,
-      path: `/pages/detail/detail?id=${article._id}`
-    };
+      console.log('格式化后的内容示例:', formattedContent.substring(0, 200));
+      return formattedContent;
+    } catch (error) {
+      console.error('格式化内容失败:', error);
+      return content;
+    }
   }
 }); 

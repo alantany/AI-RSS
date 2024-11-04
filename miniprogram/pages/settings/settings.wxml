@@ -1,14 +1,19 @@
 <view class="container">
   <view wx:if="{{!isVerified}}" class="verify-section">
     <text class="title">管理员验证</text>
-    <input 
-      type="password" 
-      placeholder="请输入管理密码"
-      password="{{true}}"
-      value="{{password}}"
-      bindinput="handlePasswordInput"
-    />
-    <button type="primary" bindtap="handleVerify">验证</button>
+    <block wx:if="{{supportBio}}">
+      <button 
+        type="primary" 
+        class="verify-btn"
+        bindtap="handleBioVerify"
+      >
+        生物认证
+      </button>
+    </block>
+    <block wx:else>
+      <text class="error-tip">当前设备不支持生物认证</text>
+      <!-- 可以添加备选的验证方式 -->
+    </block>
   </view>
 
   <view wx:else class="settings-section">
