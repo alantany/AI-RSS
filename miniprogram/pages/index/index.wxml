@@ -1,41 +1,29 @@
 <view class="container">
   <view class="header">
-    <view class="title-section">
-      <text class="title">AI 新闻聚合</text>
-      <text class="article-count">共 {{totalArticles}} 篇</text>
-    </view>
-    <button 
-      class="settings-btn" 
-      size="mini" 
-      type="primary"
-      bindtap="navigateToAdmin"
-    >
-      管理设置
-    </button>
+    <text class="title">AI 新闻聚合</text>
+    <text class="count">共 {{totalCount}} 篇</text>
   </view>
 
-  <view class="article-list">
-    <view class="article-card" wx:for="{{articles}}" wx:key="_id">
-      <view class="article-category">{{item.category}}</view>
-      <view class="article-header">
-        <text class="article-title">{{item.title}}</text>
-        <text class="article-source">{{item.source}}</text>
-      </view>
-      <view class="article-summary">{{item.summary}}</view>
-      <view class="article-footer">
-        <text class="article-date">{{item.publishDate}}</text>
-        <view class="article-actions">
-          <view class="action-item">
-            <text>{{item.views}} 阅读</text>
-          </view>
-          <view class="action-item" bindtap="handleLike" data-id="{{item._id}}">
-            <text>{{item.likes}} 点赞</text>
-          </view>
-        </view>
-      </view>
+  <view class="article-card" wx:for="{{articles}}" wx:key="_id">
+    <view 
+      class="article-header" 
+      bindtap="handleArticleClick" 
+      data-id="{{item._id}}"
+      hover-class="hover"
+    >
+      <text class="article-title">{{item.translatedTitle || item.title}}</text>
+      <text class="article-source">{{item.source}}</text>
+    </view>
+    
+    <view class="article-summary">
+      {{item.translatedSummary || item.summary}}
+    </view>
+    
+    <view class="article-footer">
+      <text class="article-date">{{item.publishDate}}</text>
     </view>
   </view>
 
   <view class="loading" wx:if="{{loading}}">加载中...</view>
-  <view class="no-more" wx:if="{{!loading && currentPage >= totalPages}}">没有更多文章了</view>
+  <!-- <view class="no-more" wx:if="{{articles.length > 0}}">没有更多文章了</view> -->
 </view> 
